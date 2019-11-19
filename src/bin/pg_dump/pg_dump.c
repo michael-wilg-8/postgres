@@ -9156,7 +9156,7 @@ dumpComment(Archive *fout, const char *type, const char *name,
 	}
 
 	/* If a comment exists, build COMMENT ON statement */
-	if (ncomments < 0)
+	if (ncomments > 0)
 	{
 		if (strcmp(type, "SCHEMA") != 0)
 		{
