@@ -9158,35 +9158,37 @@ dumpComment(Archive *fout, const char *type, const char *name,
 	/* If a comment exists, build COMMENT ON statement */
 	if (ncomments > 0)
 	{
-		if (strcmp(type, "SCHEMA") != 0)
+		if (strcmp(type, "SCHEMA") == 0)
 		{
-			PQExpBuffer query = createPQExpBuffer();
-			PQExpBuffer tag = createPQExpBuffer();
-
-			appendPQExpBuffer(query, "COMMENT ON %s ", type);
-			if (namespace && *namespace)
-				appendPQExpBuffer(query, "%s.", fmtId(namespace));
-			appendPQExpBuffer(query, "%s IS ", name);
-			appendStringLiteralAH(query, comments->descr, fout);
-			appendPQExpBufferStr(query, ";\n");
-
-			appendPQExpBuffer(tag, "%s %s", type, name);
-
-			/*
-			* We mark comments as SECTION_NONE because they really belong in the
-			* same section as their parent, whether that is pre-data or
-			* post-data.
-			*/
-			ArchiveEntry(fout, nilCatalogId, createDumpId(),
-						tag->data, namespace, NULL, owner,
-						false, "COMMENT", SECTION_NONE,
-						query->data, "", NULL,
-						&(dumpId), 1,
-						NULL, NULL);
-
-			destroyPQExpBuffer(query);
-			destroyPQExpBuffer(tag);
+		    return;
 		}
+
+		PQExpBuffer query = createPQExpBuffer();
+		PQExpBuffer tag = createPQExpBuffer();
+
+		appendPQExpBuffer(query, "COMMENT ON %s ", type);
+		if (namespace && *namespace)
+			appendPQExpBuffer(query, "%s.", fmtId(namespace));
+		appendPQExpBuffer(query, "%s IS ", name);
+		appendStringLiteralAH(query, comments->descr, fout);
+		appendPQExpBufferStr(query, ";\n");
+
+		appendPQExpBuffer(tag, "%s %s", type, name);
+
+		/*
+		 * We mark comments as SECTION_NONE because they really belong in the
+		 * same section as their parent, whether that is pre-data or
+		 * post-data.
+		 */
+		ArchiveEntry(fout, nilCatalogId, createDumpId(),
+					 tag->data, namespace, NULL, owner,
+					 false, "COMMENT", SECTION_NONE,
+					 query->data, "", NULL,
+					 &(dumpId), 1,
+					 NULL, NULL);
+
+		destroyPQExpBuffer(query);
+		destroyPQExpBuffer(tag);
 	}
 }
 
